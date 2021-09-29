@@ -633,8 +633,12 @@ ForceCloseHandlesAfterDelay(PVOID StartContext)
     for (ULONG_PTR Index = 0; Index < HandleTable->NumberOfHandles; ++Index)
     {
         FILE_OBJECT *FileObject = HandleTable->Handles[Index].Object;
-        if (!FileObject || FileObject->Type != 5 || FileObject->DeviceObject != DeviceObject)
-            continue;
+        try
+        {
+            if (!FileObject || FileObject->Type != 5 || FileObject->DeviceObject != DeviceObject)
+                continue;
+        }
+        except(EXCEPTION_EXECUTE_HANDLER) { continue; }
         Status = PsLookupProcessByProcessId(HandleTable->Handles[Index].UniqueProcessId, &Process);
         if (!NT_SUCCESS(Status))
             continue;
